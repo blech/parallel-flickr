@@ -4,7 +4,6 @@
 
 	loadlib("flickr_photos");
 	loadlib("flickr_photos_metadata");
-	loadlib("flickr_photos_exif");
 	loadlib("flickr_photos_permissions");
 	loadlib("flickr_geo_permissions");
 
@@ -12,7 +11,7 @@
 	loadlib("flickr_urls");
 	loadlib("flickr_places");
 
-	$photo_id = get_int32("id");
+	$photo_id = get_int64("id");
 
 	if (! $photo_id){
 		error_404();
@@ -44,17 +43,29 @@
 	$is_own = ($owner['id'] == $GLOBALS['cfg']['user']['id']) ? 1 : 0;
 	$GLOBALS['smarty']->assign("is_own", $is_own);
 
-	$bookends = flickr_photos_get_bookends($photo, $GLOBALS['cfg']['user']['id']);
+	# context (next and previous)
+
+	$context = get_str("context");
+
+	if ($context == 'faves'){
+		# please write me
+	}
+
+	else if ($context == 'place'){
+		# please write me
+	}
+
+	else {
+		$bookends = flickr_photos_get_bookends($photo, $GLOBALS['cfg']['user']['id']);
+	}
+
 	$GLOBALS['smarty']->assign_by_ref("before", $bookends['before']);
 	$GLOBALS['smarty']->assign_by_ref("after", $bookends['after']);
 
+	# meta, geo, etc.
+
 	# $meta = flickr_photos_metadata_load($photo);
 	# $GLOBALS['smarty']->assign_by_ref("metadata", $meta['data']);
-
-	if ($is_own){
-
-		$photo['has_exif'] = flickr_photos_exif_has_exif($photo);
-	}
 
 	$photo['can_view_geo'] = ($photo['hasgeo'] && flickr_geo_permissions_can_view_photo($photo, $GLOBALS['cfg']['user']['id'])) ? 1 : 0;
 

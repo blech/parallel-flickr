@@ -3,6 +3,8 @@
 	#################################################################
 
 	loadlib("flickr_photos");
+	loadlib("flickr_photos_permissions");
+	loadlib("flickr_places");
 	loadlib("flickr_photos_lookup");
 	loadlib("flickr_photos_search");
 	loadlib("flickr_api");
@@ -74,9 +76,6 @@
 
 	function flickr_photos_import_photo($photo, $more=array()){
 
-		# TO DO (maybe?) : check to see whether the photo has
-		# EXIF and set $photo['hasexif'] ... (201111/18/straup)
-
 		$user = flickr_users_ensure_user_account($photo['owner'], $photo['ownername']);
 
 		if ((! $user) || (! $user['id'])){
@@ -110,9 +109,42 @@
 
 		flickr_photos_import_photo_files($photo, $more);
 
+		# exif data
+
+		$more = array(
+			'force' => 1,
+		);
+
+		if ($hasexif = flickr_photos_exif_has_exif($photo, $more)){
+
+			$update = array(
+				'hasexif' => 1
+			);
+
+			$rsp = flickr_photos_update_photo($photo, $update);
+
+			# technically we'll have the old last_update date
+			# but that shouldn't be a problem (20111121/straup)
+
+			if ($rsp['ok']){
+				$photo = array_merge($photo, $update);
+			}
+		}
+
+		# things that depend on solr (move to a separate function?)
+
 		if ($GLOBALS['cfg']['enable_feature_solr']){
 			flickr_photos_search_index_photo($photo);
 		}
+
+		if (($GLOBALS['cfg']['enable_feature_solr']) && ($GLOBALS['cfg']['enable_feature_places'])){
+
+			if (($photo['woeid']) && ($GLOBALS['cfg']['places_prefetch_data'])){
+				flickr_places_get_by_woeid($photo['woeid']);
+			}
+		}
+
+		# go!
 
 		return array(
 			'ok' => 1,
@@ -407,24 +439,26 @@
 		$isfamily = ($photo['isfamily']) ? 1 : 0;
 		$isfriend = ($photo['isfriend']) ? 1 : 0;
 
+		$perms_map = flickr_photos_permissions_map("string keys");
+
 		if ($ispublic){
-			$perms = 0;
+			$perms = $perms_map['public'];
 		}
 
 		else if (($isfamily) && ($isfriend)){
-			$perms = 4;
+			$perms = $perms_map['friends and family'];
 		}
 
 		else if ($isfamily){
-			$perms = 3;
+			$perms = $perms_map['family'];
 		}
 
 		else if ($isfriend){
-			$perms = 2;
+			$perms = $perms_map['friends'];
 		}
 
 		else {
-			$perms = 5;
+			$perms = $perms_map['private'];
 		}
 
 		$photo['perms'] = $perms;
@@ -439,6 +473,9 @@
 
 		$photo['media'] = ($photo['media'] == 'photo') ? 0 : 1;
 		unset($photo['media_status']);
+
+		# Strictly speaking, I am probably most responsible for
+		# the need to do this. I'm sorry... (20111121/straup)
 
 		$photo['hasgeo'] = ($photo['accuracy']) ? 1 : 0;
 

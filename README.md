@@ -1,4 +1,4 @@
-parallel-flickr
+parallel-flickr 🐼
 ==
   
 parallel-flickr is a tool for backing up your Flickr photos and generating a database backed website that honours the viewing permissions you've chosen on Flickr. parallel-flickr is **not** a replacement for Flickr.
@@ -50,6 +50,8 @@ To do:
 * cron jobs for backups
 
 * consider moving all the backup jobs (fetching data for individual photos) in to a proper queuing system - this should probably be a feature flag so that the whole thing can still be run in "stupid" mode and not spiral in to astronaut territory.
+
+* context-specific URLs (e.g. in-faves or in-WOEID)
 
 * display metadata
 

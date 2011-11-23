@@ -1,0 +1,76 @@
+{capture assign="page_title"}{$owner.username} | photos from {$place.name}{/capture}
+{include file="inc_head.txt"}
+
+{* TO DO: either get place extent or calculate zoom by place type... *}
+{* TO DO: figure out why safari doesn't honour the .place_map css definition... *}
+
+<div class="map place_map" data-provider="{$cfg.slippymap_provider|escape}" data-center="{$place.latitude|escape},{$place.longitude|escape}" data-zoom="12" data-interactive="false" id="map_{$photo.id|escape}" style="width:100%;">
+
+{foreach from=$photos item="photo"}
+	<div class="marker" data-location="{$photo.latitude|escape},{$photo.longitude|escape}">
+		<span class="marker_text">{$photo.datetaken|@flickr_dates_verbosify_iso8601}</span>
+	</div>
+{/foreach}
+
+{* TO DO: write a bloody possess modifier... *}
+
+<h2>{if $is_own}your photos from {$place.name|escape}{else}{$owner.username|escape}'s photos from {$place.name|escape}{/if}</h2>
+</div>
+
+<ul class="place_hierarchy">
+
+<li><a href="{$owner|@flickr_urls_photos_user}places/">Places</a> /</li>
+
+{foreach from=$hierarchy item="row"}
+<li>
+{if $row.woeid == $place.woeid}
+<strong>{$row.name|escape}</strong>
+{else}
+<a href="{$owner|@flickr_urls_photos_user}places/{$row.woeid|escape}/" title="photos from {$row.name|escape} ({$row.placetype|escape})">{$row.name|escape}</a> / 
+{/if}
+</li>
+{/foreach}
+</li>
+</ul>
+
+{if $photos|@count}
+{foreach from=$photos item="row"}
+
+<div class="photos_user_photo">
+
+<div class="photo">
+<a href="{$row|@flickr_urls_photo_page}"><img src="{$row|@flickr_urls_photo_static}" /></a>
+<div class="photo_when">{$row.datetaken|@flickr_dates_verbosify_iso8601}</div>
+</div>
+
+<div class="photo_sidebar" style="margin-top:0px;">
+{include file="inc_flickr_photo_map.txt" photo=$row}
+</div>
+
+<br clear="all" />
+
+</div>
+
+{/foreach}
+
+{include file="inc_pagination.txt"}
+
+{else}
+
+{if $error}
+	<p class="error">Hrmph. There was a problem fetching photos!</p>
+{else}
+
+{if $is_own}
+<p>You haven't taken any photos here!</p>
+{else}
+<p>{$owner.username|escape} hasn't taken any photos you can see here.</p>
+{/if}
+
+{/if}
+
+{/if}
+
+{include file="inc_flickr_photo_map_load.txt"}
+
+{include file="inc_foot.txt"}

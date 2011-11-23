@@ -16,7 +16,7 @@
 
 	$GLOBALS['cfg']['environment'] = <%= environment %>;
 
-	$GLOBALS['cfg']['site_name'] = <%= sitename %>;
+	$GLOBALS['cfg']['site_name'] = <%= sitename || '🐼  | parallel-flickr' %>;
 
 	$GLOBALS['cfg']['site_disabled'] = 0;
 	$GLOBALS['cfg']['site_disabled_retry_after'] = 0;	# seconds; if set will return HTTP Retry-After header
@@ -88,6 +88,13 @@
 
 	$GLOBALS['cfg']['enable_feature_solr'] = 0;
 	$GLOBALS['cfg']['solr_endpoint'] = 'http://localhost:8993/solr/parallel-flickr/';
+
+	# Hey look! Things that require Solr.
+
+	$GLOBALS['cfg']['enable_feature_places'] = 0;
+	$GLOBALS['cfg']['places_prefetch_data'] = 1;
+
+	#
 
 	$GLOBALS['cfg']['rewrite_static_urls'] = array(
 		# '/foo' => '/bar/',
