@@ -27,8 +27,6 @@
 	$GLOBALS['smarty']->assign_by_ref("owner", $owner);
 	$GLOBALS['smarty']->assign("is_own", $is_own);
 
-	# TO DO: check to see if facet is apssed in as a q uery param
-
 	$facet = get_str("facet");
 
 	$placetypes = flickr_places_valid_placetypes();
@@ -46,13 +44,12 @@
 
 	#
 
-	$viewer_id = $GLOBALS['cfg']['user']['id'];
-
 	$more = array(
 		'mincount' => $mincount,
+		'viewer_id' => $GLOBALS['cfg']['user']['id'],
 	);
 
-	$rsp = flickr_photos_places_for_user_facet($owner, $facet, $viewer_id, $more);
+	$rsp = flickr_photos_places_for_user_facet($owner, $facet, $more);
 
 	if ($rsp['ok']){
 

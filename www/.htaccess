@@ -76,7 +76,7 @@ RewriteRule  ^account/delete/?$		/account_delete.php	[L]
 
 RewriteRule ^photo.gne$							/flickr_photo.php?%{QUERY_STRING} [L]
 
-RewriteRule ^photos/me(/(faves))?/?$					/flickr_photos_me.php?context=$2&%{QUERY_STRING} [L]
+RewriteRule ^photos/me(/([a-z_]+))?/?$					/flickr_photos_me.php?context=$2&%{QUERY_STRING} [L]
 
 RewriteRule ^photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))(/page([0-9]+))?/?$	/flickr_photos_user.php?path=$2&nsid=$3&page=$5&%{QUERY_STRING} [L]
 
@@ -84,6 +84,15 @@ RewriteRule ^photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))(/page([0-9]+))?/?$	/flic
 
 RewriteRule ^photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))/places/?$		/flickr_photos_user_places.php?path=$2&nsid=$3&%{QUERY_STRING} [L]
 RewriteRule ^photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))/places/(\d+)(/page([0-9]+))?/?$		/flickr_photos_user_place.php?path=$2&nsid=$3&woeid=$4&page=$6&%{QUERY_STRING} [L]
+
+# cameras
+
+RewriteRule ^photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))/cameras/?$		/flickr_photos_user_cameras.php?path=$2&nsid=$3&%{QUERY_STRING} [L]
+
+RewriteRule ^photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))/cameras/([0-9a-zA-z-_\s\+]+)(/page([0-9]+))?/?$		/flickr_photos_user_camera.php?path=$2&nsid=$3&make=$4&page=$6&%{QUERY_STRING} [L]
+
+RewriteRule ^photos/(([0-9a-zA-Z-_]+)|([0-9]+@N[0-9]+))/cameras/([0-9a-zA-z-_\s\+]+)/([0-9a-zA-z-_\s\+]+)(/page([0-9]+))?/?$		/flickr_photos_user_camera.php?path=$2&nsid=$3&make=$4&model=$5&page=$7&%{QUERY_STRING} [L]
+
 
 # timecapsule
 # TO DO: finish

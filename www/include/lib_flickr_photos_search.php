@@ -3,8 +3,13 @@
 	#################################################################
 
 	loadlib("solr");
-	loadlib("solr_machinetags");
+	loadlib("solr_utils");
 	loadlib("solr_dates");
+	loadlib("solr_machinetags");
+
+	loadlib("flickr_photos_permissions");
+	loadlib("flickr_geo_permissions");
+
 	loadlib("flickr_photos_metadata");
 	loadlib("flickr_places");
 
@@ -13,10 +18,106 @@
 
 	#################################################################
 
+	function flickr_photos_search(&$query, $more=array()){
+
+		if (! $GLOBALS['cfg']['enable_feature_solr']){
+			return not_ok('search indexing is disabled');
+		}
+
+		# OMGWTF: When sorting by date_taken|posted the results
+		# are basically anything but sorted. It's unclear to me
+		# whether this is a known Lucene thing or ... what? I
+		# suppose it might make sense to store dates as INTs but
+		# then we lose the ability to do date facteing, for calendar
+		# pages sometime in the future. So for now we'll just sort
+		# by photo ID since it accomplishes the same thing...
+		# (20111121/straup)
+		#
+		# see also: http://phatness.com/2009/11/sorting-by-date-with-solr/
+
+		$defaults = array(
+			'viewer_id' => 0,
+			'sort' => 'photo_id desc',
+		);
+
+		$more = array_merge($defaults, $more);
+
+		$q = solr_utils_hash2query($query, " AND ");
+
+		$params = array(
+			'q' => $q,
+			'sort' => $more['sort'],
+		);
+
+		$owner_id = (isset($query['photo_owner'])) ? $query['photo_owner'] : 0;
+
+		if ($fq = _flickr_photos_search_perms_fq($owner_id, $more['viewer_id'], $more)){
+			$params['fq'] = $fq;
+		}
+
+		$rsp = solr_select($params, $more);
+
+		if (! $rsp['ok']){
+			return $rsp;
+		}
+
+		$photos = array();
+
+		foreach ($rsp['rows'] as $row){
+			$photo = flickr_photos_get_by_id($row['photo_id']);
+
+			$can_view_geo = ($photo['hasgeo'] && flickr_geo_permissions_can_view_photo($photo, $more['viewer_id'])) ? 1 : 0;
+
+			$photo['can_view_geo'] = $can_view_geo;
+			$photos[] = $photo;
+		}
+
+		$rsp['rows'] = $photos;
+		return $rsp;
+	}
+
+	#################################################################
+
+	function flickr_photos_search_facet(&$query, $facet, $more=array()){
+
+		if (! $GLOBALS['cfg']['enable_feature_solr']){
+			return not_ok('search indexing is disabled');
+		}
+
+		$defaults = array(
+			'viewer_id' => 0,
+		);
+
+		$more = array_merge($defaults, $more);
+
+		$q = solr_utils_hash2query($query, " AND ");
+
+		$params = array(
+			'q' => $q,
+			"facet" => "on",
+			"facet.field" => $facet,
+		);
+
+		$owner_id = (isset($query['photo_owner'])) ? $query['photo_owner'] : 0;
+
+		if ($fq = _flickr_photos_search_perms_fq($owner_id, $more['viewer_id'], $more)){
+			$params['fq'] = $fq;
+		}
+
+		$rsp = solr_facet($params, $more);
+
+		if (! $rsp['ok']){
+			return $rsp;
+		}
+
+		return $rsp;
+	}
+
+	#################################################################
+
 	function flickr_photos_search_index_photo(&$photo){
 
 		if (! $GLOBALS['cfg']['enable_feature_solr']){
-
 			return not_ok('search indexing is disabled');
 		}
 
@@ -90,14 +191,20 @@
 
 			$exif = $rsp['rows'];
 
-			# TO DO: normalize (and probably sanitize)
+			if (isset($exif['Make'])){
 
-			if (isset($exif['Model'])){
-				$doc['camera_model'] = trim($exif['Model']);
+				if ($make = exif_tools_scrub_string($exif['Make'])){
+
+					$doc['camera_make'] = ucwords($make);
+				}
 			}
 
-			if (isset($exif['Make'])){
-				$doc['camera_make'] = trim($exif['Make']);
+			if (isset($exif['Model'])){
+
+				if ($model = exif_tools_scrub_string($exif['Model'])){
+
+					$doc['camera_model'] = $model;
+				}
 			}
 
 			# EXIF: what else?
@@ -140,6 +247,48 @@
 
 		$rsp = solr_add($docs);
 		return $rsp;
+	}
+
+	#################################################################
+
+	function _flickr_photos_search_perms_fq($owner_id=0, $viewer_id=0, $more=array()){
+
+		if (($owner_id) && ($owner_id == $viewer_id)){
+			return;
+		}
+
+		# THIS IS NOT AWESOME. PERMISSIONS IN SOLR SHOULD
+		# PROBABLY JUST ALL BE PRE-COMPUTED AND STORED THE
+		# SAME WAY MACHINETAGS ARE.... (20111119/straup)
+
+		$fq = array();
+
+		if ($perms = flickr_photos_permissions_photos_where($owner_id, $viewer_id)){
+
+			$count = count($perms);
+
+			for ($i=0; $i < $count; $i++){
+				$perms[$i] = "photo_perms:" . urlencode($perms[$i]);
+			}
+
+			$fq[] = implode(" OR ", $perms);
+		}
+
+		if (isset($more['enforce_geoperms'])){
+
+			if ($perms = flickr_geo_permissions_photos_where($owner_id, $viewer_id)){
+
+				$count = count($perms);
+
+				for ($i=0; $i < $count; $i++){
+					$perms[$i] = "geo_perms:" . urlencode($perms[$i]);
+				}
+
+				$fq[] = implode(" OR ", $perms);
+			}
+		}
+
+		return $fq;
 	}
 
 	#################################################################

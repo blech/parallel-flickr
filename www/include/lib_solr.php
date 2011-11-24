@@ -89,14 +89,17 @@
 		# facets but for now we don't  (20111120/straup)
 
 		$facet = $params['facet.field'];
-		$count_facet = count($fields[$facet]) - 1;
+		$count_facet = count($fields[$facet]);
 
 		foreach (range(0, $count_facet, 2) as $i){
 
-			$woeid = $fields[$facet][$i];
-			$count = $fields[$facet][$i + 1];
+			if ($i == $count_facet){
+				break;
+			}
 
-			$facets[$woeid] = $count;
+			$key = $fields[$facet][$i];
+			$count = $fields[$facet][$i + 1];
+			$facets[$key] = $count;
 		}
 
 		arsort($facets);

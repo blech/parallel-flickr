@@ -1,6 +1,7 @@
 {if $cfg.enable_feature_slippymaps}
 
 {if $photo.hasgeo and $photo.can_view_geo}
+
 <div class="photo_map">
 	<div class="map" data-provider="{$cfg.slippymap_provider|escape}" data-center="{$photo.latitude|escape},{$photo.longitude|escape}" data-zoom="{$photo.accuracy-2|escape}" data-interactive="false" id="map_{$photo.id|escape}">
 		<div class="marker" data-location="{$photo.latitude|escape},{$photo.longitude|escape}"><span class="marker_text">{$photo.latitude|string_format:"%.3f"|escape},{$photo.longitude|string_format:"%.3f"|escape}</span></div>
@@ -21,9 +22,10 @@
 	</div>
 </div>
 
-{else}
+{elseif $show_nullisland}
 	{include file="inc_flickr_photo_map_nullisland.txt"}
-
+{else}
+	{* silence *}
 {/if}
 
 {/if}

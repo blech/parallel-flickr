@@ -75,10 +75,43 @@
 
 	#################################################################
 
+	function flickr_urls_photos_user_places(&$user){
+
+		$user = flickr_urls_photos_user($user);
+		return "{$user}places/";
+	}
+
+	#################################################################
+
 	function flickr_urls_photos_user_place(&$user, &$place){
 
+		$places = flickr_urls_photos_user_places($user);
+		return "{$places}{$place['woeid']}/";	
+	}
+
+	#################################################################
+
+	function flickr_urls_photos_user_cameras(&$user){
+
 		$user_url = flickr_urls_photos_user($user);
-		return "{$user_url}places/{$place['woeid']}/";	
+		return "{$user_url}cameras/";	
+	}
+
+	#################################################################
+
+	function flickr_urls_photos_user_camera(&$user, $make, $model=null){
+
+		$root = flickr_urls_photos_user_cameras($user);
+
+		$enc_make = urlencode($make);
+		$url = "{$root}{$enc_make}/";
+
+		if ($model){
+			$enc_model = urlencode($model);
+			$url .= "{$enc_model}/";
+		}
+
+		return $url;
 	}
 
 	#################################################################
