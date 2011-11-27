@@ -9,7 +9,7 @@ apache::vhost { "parallel-flickr":
 }
 
 file { "/usr/local/parallel-flickr/www/templates_c":
-  require => Apache::Vhost["parallel-flickr"],
+  require => Vcsrepo["/usr/local/parallel-flickr"],
   owner => "www-data",
   mode => '0744',
 }
