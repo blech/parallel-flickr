@@ -14,15 +14,15 @@ Installing parallel-flickr
 
 * First, some basic OS-level setup:
 
-	$> sudo apt-get install git-core
+	v$> sudo apt-get install git-core
 
-	$> git clone git@github.com:straup/parallel-flickr.git
+	v$> git clone git@github.com:straup/parallel-flickr.git
 
-	$> cd parallel-flickr
+	v$> cd parallel-flickr
 
-	$> sudo sh ./ubuntu/install.sh
+	v$> sudo sh ./ubuntu/install.sh
 
-	$> sudo chown -R www-data templates_c
+	v$> sudo chown -R www-data templates_c
 
 	TO DO: apache configs
 
