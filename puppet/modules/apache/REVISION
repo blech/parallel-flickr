@@ -1,4 +1,4 @@
 module: puppetlabs/apache
 version: 0.0.3
 url: file:///Users/lattice/.puppet/var/puppet-module/cache/http_forge_puppetlabs_com-75a31f1d6f1ef6eb63b4479b3512ee1508209a7f/puppetlabs-apache-0.0.3.tar.gz
-installed: 2011-11-18 18:02:58 +0000
+installed: 2011-11-28 16:24:03 +0000

@@ -1,6 +1,6 @@
 include "mysql"
 
-$dbpassword = "nonesofar"
+import "database-common"
 
 class { 'mysql::server':
 }
