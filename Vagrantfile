@@ -6,7 +6,7 @@ Vagrant::Config.run do |config|
   config.vm.network "192.168.245.10"
 
   config.vm.forward_port "http", 80, 8080
-  # config.vm.share_folder "v-data", "/vagrant_data", "../data"
+  config.vm.share_folder "parallel-flickr", "/parallel-flickr", "."
 
   config.vm.provision :puppet do |puppet|
     puppet.manifests_path = "puppet/manifests"

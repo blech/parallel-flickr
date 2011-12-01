@@ -5,7 +5,7 @@ apache::vhost { "parallel-flickr":
   priority => '10',
   port => '80',
   docroot => '/usr/local/parallel-flickr/www',
-  require => [Vcsrepo["/usr/local/parallel-flickr"], Package["httpd"]],
+  require => [File["/usr/local/parallel-flickr"], Package["httpd"]],
   template => "parallel-flickr/parallel-flickr.conf.erb"
 }
 
@@ -27,17 +27,28 @@ file { "/etc/apache2/mods-enabled/rewrite.load":
 }
 
 file { "/usr/local/parallel-flickr/www/templates_c":
-  require => Vcsrepo["/usr/local/parallel-flickr"],
+  ensure => directory,
+  require => File["/usr/local/parallel-flickr"],
   owner => "www-data",
   mode => '0744',
 }
 
-vcsrepo { "/usr/local/parallel-flickr":
-  ensure => latest,
-  provider => git,
-  source => 'https://github.com/straup/parallel-flickr.git',
-  require => Package["git"],
+file { "/usr/local/parallel-flickr":
+  ensure => directory,
+  recurse => true,
+  purge => true,
+  force => true,
+  source => "/parallel-flickr"
 }
+
+# uncomment this to pull from aaron's main repository
+#
+#vcsrepo { "/usr/local/parallel-flickr":
+#  ensure => latest,
+#  provider => git,
+#  source => 'https://github.com/straup/parallel-flickr.git',
+#  require => Package["git"],
+#}
 
 import "database-common"
 
@@ -56,7 +67,7 @@ file { "parallel-flickr-config":
   owner => root,
   group => www-data,
   mode => 440,
-  require => Vcsrepo["/usr/local/parallel-flickr"]
+  require => File["/usr/local/parallel-flickr"]
 }
               
 # Ensure PHP is present with relevant modules.
