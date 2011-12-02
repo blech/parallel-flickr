@@ -12,6 +12,26 @@ In the meantime, [here's a blog post](http://www.aaronland.info/weblog/2011/10/1
 Installing parallel-flickr
 --
 
+The Easy Way (local VM only, for now)
+--
+
+* Install Vagrant (http://vagrantup.com/)
+
+  $> gem install vagrant
+
+* Install VirtualBox: https://www.virtualbox.org/
+
+* Create the VM
+
+  $> vagrant up
+
+* Setup the database
+
+  http://localhost:8080/god/setup.php
+
+The Somewhat Harder Way
+--
+
 * First, some basic OS-level setup:
 
 	v$> sudo apt-get install git-core
