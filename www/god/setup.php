@@ -7,19 +7,28 @@
     // There aren't any tables, so this is initial setup. Create the database, and away we go.
     if ( $tables['ok'] && count($tables['rows']) == 0 ) {
 
-        $schema = file_get_contents(FLAMEWORK_WWW_DIR . "/../schema/db_main.schema");
-        $schema_queries = preg_split('/;/', $schema);
+        $schemas = array(
+          "main"    => file_get_contents(FLAMEWORK_WWW_DIR . "/../schema/db_main.schema"),
+          "tickets" => file_get_contents(FLAMEWORK_WWW_DIR . "/../schema/db_tickets.schema"),
+          "users"   => file_get_contents(FLAMEWORK_WWW_DIR . "/../schema/db_users.schema")
+        );
 
         $GLOBALS['smarty']->assign('error', false);
 
-        foreach ($schema_queries as $query) {
+        foreach ($schemas as $class => $schema) {
 
-            $result = _db_query($query, 'main');
+            $schema_queries = preg_split('/;/', $schema);
 
-            if (!$result['ok']) {
-              $GLOBALS['smarty']->assign('error', $result);
-              break;
-            }
+            foreach ($schema_queries as $class => $query) {
+
+                $result = _db_query($query, $class);
+
+                if (!$result['ok']) {
+                   $GLOBALS['smarty']->assign('error', $result);
+                   break;
+                 }
+             }
+        
         }
 
         $GLOBALS['smarty']->display("page_god_setup.txt");
