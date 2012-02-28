@@ -1,4 +1,6 @@
 *~
+.vagrant
+.*.swp
 static
 config.php
 config.local.php

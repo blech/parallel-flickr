@@ -1,0 +1,44 @@
+<VirtualHost *:<%= port %>>
+	ServerName <%= name %>
+	# ServerAdmin webmaster@localhost
+
+    <%if serveraliases.is_a? Array -%>
+    <% serveraliases.each do |name| -%><%= "  ServerAlias #{name}\n" %><% end -%>
+    <% elsif serveraliases != '' -%>
+    <%= "  ServerAlias #{serveraliases}" -%>
+    <% end -%>
+
+	DocumentRoot <%= docroot %>
+
+	<Directory />
+		Options FollowSymLinks
+		AllowOverride None
+	</Directory>
+
+	<Directory <%= docroot %>>
+		Options FollowSymLinks Indexes
+		# AllowOverride FileInfo Limit
+		AllowOverride All
+		Order allow,deny
+		allow from all
+	</Directory>
+
+	# see also: the 'flickr_static_path' config
+	# in www/include/config.php(.example)
+
+	Alias /static/ /usr/local/<%= name %>-static/
+
+	<Directory /usr/local/<%= name %>-static/>
+		Options None
+		AllowOverride None
+	</Directory>
+
+	ErrorLog ${APACHE_LOG_DIR}/<%= name %>-error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel warn
+
+	CustomLog ${APACHE_LOG_DIR}/<%= name %>-access.log combined
+
+</VirtualHost>

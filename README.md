@@ -12,17 +12,36 @@ In the meantime, [here's a blog post](http://www.aaronland.info/weblog/2011/10/1
 Installing parallel-flickr
 --
 
-_These instructions are incomplete. They'll probably work but I have tested them from scratch yet. The following assumes you're running on a brand new vanilla Ubuntu machine._
+The Easy Way (local VM only, for now)
+--
+
+* Install Vagrant (http://vagrantup.com/)
+
+  $> gem install vagrant
+
+* Install VirtualBox: https://www.virtualbox.org/
+
+* Create the VM
+
+  $> vagrant up
+
+* Setup the database
+
+  http://localhost:8080/god/setup.php
+
+The Somewhat Harder Way
+--
 
 * First, some basic OS-level setup:
 
-	$> sudo apt-get install git-core
+	v$> sudo apt-get install git-core
 
-	$> git clone git@github.com:straup/parallel-flickr.git
+	v$> git clone git@github.com:straup/parallel-flickr.git
 
-	$> cd parallel-flickr
+	v$> cd parallel-flickr
 
-	$> sudo sh ./ubuntu/install.sh
+	v$> sudo sh ./ubuntu/install.sh
+
 
 	$> sudo chown -R www-data www/templates_c
 

@@ -1,0 +1,17 @@
+{include file="inc_god_head.txt"}
+
+<h2>Setup</h2>
+
+{if $error}
+<p>
+Oops, there was an error while setting up the database: Got {$error.error_code}: {$error.error} while executing {$error.sql} on {$error.cluster}/{$error.shard}.
+</p>
+
+<p>Try again, or seek out help.</p>
+{else}
+<p>
+Your database is now configured. You can <a href="/">go ahead</a> and use Parallel-Flickr now!
+</p>
+{/if}
+
+{include file="inc_god_foot.txt"}

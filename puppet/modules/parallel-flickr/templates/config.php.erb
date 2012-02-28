@@ -14,9 +14,9 @@
 	# Basic stuff
 	#
 
-	$GLOBALS['cfg']['environment'] = 'prod';
+	$GLOBALS['cfg']['environment'] = <%= parallel_flickr_environment %>;
 
-	$GLOBALS['cfg']['site_name'] = '🐼  | parallel-flickr';
+	$GLOBALS['cfg']['site_name'] = <%= sitename %>;
 
 	$GLOBALS['cfg']['site_disabled'] = 0;
 	$GLOBALS['cfg']['site_disabled_retry_after'] = 0;	# seconds; if set will return HTTP Retry-After header
@@ -52,7 +52,17 @@
 	$GLOBALS['cfg']['db_enable_poormans_federation'] = 1;
 	$GLOBALS['cfg']['db_enable_poormans_ticketing'] = 1;
 
-	$GLOBALS['cfg']['abs_root_url']		= 'http://'.($_SERVER['SERVER_NAME'] ? $_SERVER['SERVER_NAME'] : 'fake.com').'/';
+    $scheme = $_SERVER['HTTPS'] ? 'https' : 'http';
+
+    if ($scheme == 'http' && $_SERVER['REMOTE_PORT'] == 80) {
+      $port = '';
+    } elseif ($scheme == 'https' && $_SERVER['REMOTE_PORT'] == 443) {
+      $port = '';
+    } else {
+      $port = ":" . $_SERVER['SERVER_PORT'];
+    }
+
+	$GLOBALS['cfg']['abs_root_url']		= $scheme . '://'.($_SERVER['SERVER_NAME'] ? $_SERVER['SERVER_NAME'] : 'fake.com'). $port . '/';
 	$GLOBALS['cfg']['safe_abs_root_url']	= $GLOBALS['cfg']['abs_root_url'];
 
 	$GLOBALS['cfg']['smarty_template_dir'] = realpath(dirname(__FILE__) . '/../templates/');
@@ -76,21 +86,21 @@
 		'host'	=> 'localhost',
 		'name'	=> 'flickr',
 		'user'	=> 'flickr',
-		'pass'	=> 'TWEAK ME',
+		'pass'	=> '<%= dbpassword %>',	# see also: bin/generate_secret.php
 		'auto_connect' => 1,
 	);
 
 	# http://www.flickr.com/services/apps/create/apply/
 
-	$GLOBALS['cfg']['flickr_api_key'] = 'TWEAK ME';
-	$GLOBALS['cfg']['flickr_api_secret'] = 'TWEAK ME';
+	$GLOBALS['cfg']['flickr_api_key'] = '<%= flickr_api_key %>';
+	$GLOBALS['cfg']['flickr_api_secret'] = '<%= flickr_api_secret %>';
 	$GLOBALS['cfg']['flickr_api_perms'] = 'read';
 
 	# See also: https://github.com/straup/parallel-flickr/blob/master/bin/generate_secret.php
 
-	$GLOBALS['cfg']['crypto_cookie_secret'] = 'TWEAK ME';
-	$GLOBALS['cfg']['crypto_password_secret'] = 'TWEAK ME';
-	$GLOBALS['cfg']['crypto_crumb_secret'] = 'TWEAK ME';
+	$GLOBALS['cfg']['crypto_cookie_secret'] = '<%= crypto_cookie_secret %>';
+	$GLOBALS['cfg']['crypto_password_secret'] = '<%= crypto_password_secret %>';
+	$GLOBALS['cfg']['crypto_crumb_secret'] = '<%= crypto_crumb_secret %>';
 
 	# By default, parallel-flickr stores files on the local file system. It is possible
 	# to store your photos (and metadata) using Amazon's S3 service but you'll need to
@@ -100,7 +110,7 @@
 	# in your Apache config. See also:
 	# https://github.com/straup/parallel-flickr/blob/master/apache/parallel-flickr.conf.example
 
-	$GLOBALS['cfg']['flickr_static_path'] = "TWEAK ME";
+	$GLOBALS['cfg']['flickr_static_path'] = "<%= flickr_static_path %>";
 	$GLOBALS['cfg']['flickr_static_url'] = $GLOBALS['cfg']['abs_root_url'] . "static/";
 
 	# If you want to store your photos (and metadata) using Amazon's S3
